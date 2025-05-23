@@ -21,30 +21,22 @@ sudo journalctl --rotate
 sudo journalctl --vacuum-time=3d
 sudo journalctl --vacuum-size=200M
 
-echo "========== 🐳 Очистка Docker =========="
+echo "========== 🐳 Очистка Docker (без перезапуска) =========="
 
-echo "5️⃣ ⛔ Остановка и удаление неиспользуемых контейнеров, образов, сетей..."
+echo "5️⃣ ⛔ Удаление неиспользуемых контейнеров, образов, сетей..."
 docker container prune -f
 docker image prune -a -f
 docker volume prune -f
 docker network prune -f
 docker system prune -a --volumes -f
 
-echo "6️⃣ 🗂 Ограничение логов Docker (если ещё не настроено)..."
+echo "6️⃣ ⚙️ Проверка настроек логов Docker (без изменений)..."
 DOCKER_CONF="/etc/docker/daemon.json"
-if [ ! -f "$DOCKER_CONF" ]; then
-  echo "{}" | sudo tee "$DOCKER_CONF"
+if [ -f "$DOCKER_CONF" ]; then
+  echo "ℹ️ Настройки Docker уже существуют — файл не изменён."
+else
+  echo "ℹ️ Файл $DOCKER_CONF отсутствует. Пропущено."
 fi
-
-if ! grep -q "max-size" "$DOCKER_CONF"; then
-  sudo tee "$DOCKER_CONF" > /dev/null <<EOF
-{
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "10m",
-    "max-file": "3"
-  }
-}
 
 echo "========== 📁 Очистка логов =========="
 
@@ -56,4 +48,4 @@ sudo find /var/log -type f -name "*.log" -size +10M -exec truncate -s 0 {} \;
 echo "========== 📊 Топ-10 папок по размеру (для анализа) =========="
 sudo du -sh /* 2>/dev/null | sort -hr | head -n 10
 
-echo "✅ Очистка завершена!"
+echo "✅ Очистка завершена без перезапуска Docker!"
