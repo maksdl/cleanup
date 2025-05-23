@@ -45,10 +45,6 @@ if ! grep -q "max-size" "$DOCKER_CONF"; then
     "max-file": "3"
   }
 }
-EOF
-  echo "🔄 Перезапуск Docker..."
-  sudo systemctl restart docker
-fi
 
 echo "========== 📁 Очистка логов =========="
 
