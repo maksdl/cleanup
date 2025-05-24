@@ -41,6 +41,9 @@ fi
 echo "========== 📁 Очистка логов =========="
 
 echo "7️⃣ 📉 Очистка старых и сжатых логов в /var/log..."
+sudo truncate -s 0 /var/log/syslog
+sudo truncate -s 0 /var/log/kern.log
+sudo truncate -s 0 /var/log/auth.log
 sudo find /var/log -type f -name "*.gz" -delete
 sudo find /var/log -type f -name "*.1" -delete
 sudo find /var/log -type f -name "*.log" -size +10M -exec truncate -s 0 {} \;
